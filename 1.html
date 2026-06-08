@@ -2,8 +2,223 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>GG g-code viewer</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GG G-code Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #252525;
+            --bg-tertiary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --accent-blue: #00d4ff;
+            --accent-yellow: #ffff00;
+            --accent-orange: #ff9900;
+            --accent-red: #ff4444;
+            --accent-purple: #b388ff;
+            --border-color: #404040;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: calc(100vh - 40px);
+        }
+
+        .sidebar {
+            width: 320px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            gap: 10px;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        button {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #3d3d3d;
+            border-color: #555;
+        }
+
+        button.active {
+            background: #3d5c3d;
+            border-color: #4caf50;
+        }
+
+        .btn-update { background: #2d5a2d; }
+        .btn-update:hover { background: #3d6a3d; }
+
+        .btn-save { background: #2d4a5a; }
+        .btn-save:hover { background: #3d5a6a; }
+
+        .btn-svg { background: #5a2d4a; }
+        .btn-svg:hover { background: #6a3d5a; }
+
+        .btn-coord.active { background: #2d5a5a; }
+        .btn-line-track.active { background: #5a5a2d; }
+        .btn-ruler.active { background: #5a2d5a; }
+
+        .tool-panel {
+            background: var(--bg-tertiary);
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .tool-label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .tool-input-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .tool-input {
+            flex: 1;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .quick-buttons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .btn-q {
+            padding: 6px 10px;
+            min-width: 36px;
+            font-size: 12px;
+        }
+
+        #gcodeArea {
+            flex: 1;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            resize: none;
+        }
+
+        .main {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #viewer {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        #mainSvg {
+            display: block;
+        }
+
+        .coord-tooltip {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--accent-blue);
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            pointer-events: none;
+        }
+
+        .axis-marker {
+            fill: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .indicator-label {
+            fill: var(--accent-yellow);
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+        }
+
+        .status-bar {
+            height: 40px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            font-size: 12px;
+        }
+
+        .status-section {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .status-item {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .status-label {
+            color: var(--text-secondary);
+        }
+
+        .status-value {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .status-file {
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+    </style>
 </head>
 <body>
 
@@ -78,27 +293,27 @@
                     <text id="indicatorText" x="0" y="0" class="indicator-label" style="display: none;">X:0.0 Y:0.0</text>
 
                     <!-- Cetvel (normal koordinatlarda, drawLayer DIŞINDA) -->
-					<g id="rulerToolLayer" style="display: block;">
-						<!-- Çizgi -->
-						<line id="rulerLine" x1="200" y1="200" x2="800" y2="800" stroke="#b388ff" stroke-width="2" stroke-dasharray="6,4" />
-						
-						<!-- Mesafe yazısı -->
-						<text id="rulerText" x="500" y="490" fill="#b388ff" font-family="monospace" font-size="14px" font-weight="bold" text-anchor="middle">0.0 mm</text>
-						
-						<!-- BAŞ noktası (A) - yarı şeffaf, ortasında + -->
-						<g id="handleAGroup" cursor="move">
-							<rect id="handleA" x="190" y="190" width="20" height="20" fill="#ff4444" stroke="#fff" stroke-width="1.5" rx="3" opacity="0.6" />
-							<line x1="195" y1="200" x2="205" y2="200" stroke="#fff" stroke-width="1.5" pointer-events="none" />  <!-- yatay çizgi -->
-							<line x1="200" y1="195" x2="200" y2="205" stroke="#fff" stroke-width="1.5" pointer-events="none" />  <!-- dikey çizgi -->
-						</g>
-						
-						<!-- SON noktası (B) - yarı şeffaf, ortasında + -->
-						<g id="handleBGroup" cursor="move">
-							<rect id="handleB" x="790" y="790" width="20" height="20" fill="#44aaff" stroke="#fff" stroke-width="1.5" rx="3" opacity="0.6" />
-							<line x1="795" y1="800" x2="805" y2="800" stroke="#fff" stroke-width="1.5" pointer-events="none" />
-							<line x1="800" y1="795" x2="800" y2="805" stroke="#fff" stroke-width="1.5" pointer-events="none" />
-						</g>
-					</g>
+                    <g id="rulerToolLayer" style="display: block;">
+                        <!-- Çizgi -->
+                        <line id="rulerLine" x1="200" y1="200" x2="800" y2="800" stroke="#b388ff" stroke-width="2" stroke-dasharray="6,4" />
+                        
+                        <!-- Mesafe yazısı -->
+                        <text id="rulerText" x="500" y="490" fill="#b388ff" font-family="monospace" font-size="14px" font-weight="bold" text-anchor="middle">0.0 mm</text>
+                        
+                        <!-- BAŞ noktası (A) - yarı şeffaf, ortasında + -->
+                        <g id="handleAGroup" cursor="move">
+                            <rect id="handleA" x="190" y="190" width="20" height="20" fill="#ff4444" stroke="#fff" stroke-width="1.5" rx="3" opacity="0.6" />
+                            <line x1="195" y1="200" x2="205" y2="200" stroke="#fff" stroke-width="1.5" pointer-events="none" />
+                            <line x1="200" y1="195" x2="200" y2="205" stroke="#fff" stroke-width="1.5" pointer-events="none" />
+                        </g>
+                        
+                        <!-- SON noktası (B) - yarı şeffaf, ortasında + -->
+                        <g id="handleBGroup" cursor="move">
+                            <rect id="handleB" x="790" y="790" width="20" height="20" fill="#44aaff" stroke="#fff" stroke-width="1.5" rx="3" opacity="0.6" />
+                            <line x1="795" y1="800" x2="805" y2="800" stroke="#fff" stroke-width="1.5" pointer-events="none" />
+                            <line x1="800" y1="795" x2="800" y2="805" stroke="#fff" stroke-width="1.5" pointer-events="none" />
+                        </g>
+                    </g>
 
                 </g>
             </svg>
@@ -122,13 +337,13 @@
         <div class="status-item"><span class="status-label">Tezgah Y Max:</span><span class="status-value" id="val-h">0.0</span></div>
         <div class="status-item"><span class="status-label">Derinlik (Z Min):</span><span class="status-value" id="val-zmin">0.0</span></div>
         <div class="status-item">
-			<span class="status-label">Safe Z:</span>
-			<span class="status-value" id="val-safe-z" style="color: #888;">0.0 mm</span>
-		</div>
-		<div class="status-item">
-			<span class="status-label">İşlem Derinliği:</span>	
-			<span class="status-value" id="val-process-depth" style="color: #ff9900;">0.0 mm</span>
-		</div>
+            <span class="status-label">Safe Z:</span>
+            <span class="status-value" id="val-safe-z" style="color: #888;">0.0 mm</span>
+        </div>
+        <div class="status-item">
+            <span class="status-label">İşlem Derinliği:</span>
+            <span class="status-value" id="val-process-depth" style="color: #ff9900;">0.0 mm</span>
+        </div>
         <div class="status-item"><span class="status-label">BBox:</span><span class="status-value" id="val-bbox" style="color: #ccc;">X: 0 / 0 | Y: 0 / 0</span></div>
     </div>
 </div>
