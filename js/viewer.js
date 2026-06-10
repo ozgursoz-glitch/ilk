@@ -6,8 +6,104 @@ const Viewer = {
     showCoordinates: true,
     showLineTrack: true,
     
+    // Zoom özellikleri
+    zoom: 1,
+    minZoom: 0.1,
+    maxZoom: 5,
+    panX: 0,
+    panY: 0,
+    isPanning: false,
+    lastMouseX: 0,
+    lastMouseY: 0,
+    
     init: function() {
         this.updatePaths();
+        this.setupZoom();
+        this.resetView();
+    },
+    
+    // Görünümü sıfırla - her zaman 4200x2100 alanı göster
+    resetView: function() {
+        const viewport = document.getElementById('viewport');
+        if (viewport) {
+            this.zoom = 1;
+            this.panX = 0;
+            this.panY = 0;
+            this.applyTransform();
+        }
+    },
+    
+    // Transform uygula
+    applyTransform: function() {
+        const viewport = document.getElementById('viewport');
+        if (viewport) {
+            viewport.setAttribute('transform', `translate(${this.panX}, ${this.panY}) scale(${this.zoom})`);
+        }
+    },
+    
+    // Zoom seviyesini ayarla
+    setZoom: function(newZoom) {
+        newZoom = Math.max(this.minZoom, Math.min(this.maxZoom, newZoom));
+        this.zoom = newZoom;
+        this.applyTransform();
+    },
+    
+    // Zoom in
+    zoomIn: function() {
+        this.setZoom(this.zoom * 1.2);
+    },
+    
+    // Zoom out
+    zoomOut: function() {
+        this.setZoom(this.zoom / 1.2);
+    },
+    
+    // Zoom kurulumu - mouse tekerleği ile zoom
+    setupZoom: function() {
+        const svg = document.getElementById('mainSvg');
+        if (svg) {
+            svg.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                
+                const delta = e.deltaY > 0 ? -1 : 1;
+                const zoomFactor = delta > 0 ? 1.1 : 0.9;
+                const newZoom = this.zoom * zoomFactor;
+                
+                this.setZoom(newZoom);
+            }, { passive: false });
+            
+            // Pan için mouse olayları
+            svg.addEventListener('mousedown', (e) => {
+                if (e.button === 1 || (e.button === 0 && e.altKey)) {
+                    this.isPanning = true;
+                    this.lastMouseX = e.clientX;
+                    this.lastMouseY = e.clientY;
+                    svg.style.cursor = 'grabbing';
+                }
+            });
+            
+            svg.addEventListener('mousemove', (e) => {
+                if (this.isPanning) {
+                    const dx = e.clientX - this.lastMouseX;
+                    const dy = e.clientY - this.lastMouseY;
+                    this.panX += dx;
+                    this.panY += dy;
+                    this.lastMouseX = e.clientX;
+                    this.lastMouseY = e.clientY;
+                    this.applyTransform();
+                }
+            });
+            
+            svg.addEventListener('mouseup', () => {
+                this.isPanning = false;
+                svg.style.cursor = 'default';
+            });
+            
+            svg.addEventListener('mouseleave', () => {
+                this.isPanning = false;
+                svg.style.cursor = 'default';
+            });
+        }
     },
     
     render: function(data) {

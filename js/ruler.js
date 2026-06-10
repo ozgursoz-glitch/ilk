@@ -45,9 +45,9 @@ const RulerTool = {
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         
-        // SVG koordinat sistemine göre düzeltme (cetvel drawLayer dışında olduğu için normal koordinatlar kullanılır)
-        const x = clientX - rect.left;
-        const y = clientY - rect.top;
+        // SVG koordinat sistemine göre düzeltme (zoom ve pan dikkate alınarak)
+        const x = (clientX - rect.left - Viewer.panX) / Viewer.zoom;
+        const y = (clientY - rect.top - Viewer.panY) / Viewer.zoom;
         
         if (this.dragging === 'A') {
             this.startX = x;
