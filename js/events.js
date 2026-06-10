@@ -49,10 +49,9 @@ const Events = {
         if (!svg) return;
         
         const rect = svg.getBoundingClientRect();
-        // SVG transform'ı dikkate alarak koordinat hesaplama
-        // scale(1, -1) translate(0, -2100) transformasyonu için düzeltme
-        const x = e.clientX - rect.left;
-        const y = 2100 - (e.clientY - rect.top); // Y eksenini ters çevir
+        // SVG transform'ı ve zoom/pan dikkate alarak koordinat hesaplama
+        const x = (e.clientX - rect.left - Viewer.panX) / Viewer.zoom;
+        const y = (e.clientY - rect.top - Viewer.panY) / Viewer.zoom;
         
         const tooltip = document.getElementById('coordTooltip');
         if (tooltip) {

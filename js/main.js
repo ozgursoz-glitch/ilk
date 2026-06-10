@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     window.autoFit = function() {
-        Viewer.autoFit();
+        Viewer.resetView();
     };
     
     window.toggleCoordinateTracking = function() {
