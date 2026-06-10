@@ -12,6 +12,7 @@ const Utils = {
     
     formatNum: function(num, decimals) {
         if (decimals === undefined) decimals = 2;
+        if (num === undefined || num === null || isNaN(num)) return '0.00';
         return num.toFixed(decimals);
     }
 };
