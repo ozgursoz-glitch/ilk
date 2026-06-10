@@ -46,8 +46,13 @@ const RulerTool = {
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         
         // SVG koordinat sistemine göre düzeltme (zoom ve pan dikkate alınarak)
-        const x = (clientX - rect.left - Viewer.panX) / Viewer.zoom;
-        const y = (clientY - rect.top - Viewer.panY) / Viewer.zoom;
+        let x = (clientX - rect.left - Viewer.panX) / Viewer.zoom;
+        let y = (clientY - rect.top - Viewer.panY) / Viewer.zoom;
+        
+        // Cetvel drawLayer dışında (viewport içinde) olduğu için Y koordinatını ters çevirmeye gerek yok
+        // Ancak kullanıcı dostu olması için G-code koordinatlarını kullanmalıyız
+        // Cetvel sol alt orijine göre çalışmalı, bu yüzden Y'yi ters çeviriyoruz
+        y = 2100 - y;
         
         if (this.dragging === 'A') {
             this.startX = x;

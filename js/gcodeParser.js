@@ -112,6 +112,9 @@ const GCodeParser = {
                 z = newZ;
                 
                 this.updateBBox(x, y);
+            } else {
+                // hasMove yoksa bile M kodları vs. olabilir, pozisyon değişmez
+                // Ancak G90/G91 modu değişebilir, bu yukarıda zaten işlendi
             }
         }
         
