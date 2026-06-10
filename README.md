@@ -16,6 +16,7 @@ A modern and interactive web-based G-code viewer with 3D visualization capabilit
 
 ```
 ├── 1.html              # Main HTML file with embedded CSS
+├── example.gm          # Sample G-code file
 ├── js/
 │   ├── main.js         # Application entry point
 │   ├── viewer.js       # 3D viewer implementation
