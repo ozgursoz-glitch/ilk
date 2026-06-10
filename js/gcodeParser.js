@@ -38,8 +38,9 @@ const GCodeParser = {
             line = line.split(/[;(]/)[0].trim();
             if (!line) continue;
             
-            // Harf ve sayıları (işaretli dahil) ayıkla: X118.000, M21, I11-, A7+ vb.
-            const parts = line.match(/[A-Z](?:\d+\.?\d*|[+-]\d+)/g);
+            // Harf ve sayıları (işaretli dahil) ayıkla: X118.000, M21, I11-, A7+, G04 D2 vb.
+            // Pattern: Bir harf, ardından opsiyonel işaret (+/-) ve sayı
+            const parts = line.match(/[A-Z][+-]?\d*\.?\d+/g);
             if (!parts) continue;
             
             let cmd = '';
@@ -56,9 +57,12 @@ const GCodeParser = {
                 if (isNaN(value)) value = 0;
                 
                 if (code === 'G') {
-                    cmd = upper;
-                    if (value === 90) this.absoluteMode = true;
-                    if (value === 91) this.absoluteMode = false;
+                    const gNum = Math.round(value);
+                    cmd = 'G' + gNum;
+                    if (gNum === 90) this.absoluteMode = true;
+                    if (gNum === 91) this.absoluteMode = false;
+                    if (gNum === 0 || gNum === 00) isRapid = true;
+                    if (gNum === 1) isRapid = false;
                 } else if (code === 'X') {
                     newX = this.absoluteMode ? value : x + value;
                     hasMove = true;
@@ -77,13 +81,6 @@ const GCodeParser = {
                     // Diğer parametreler (S: speed, D: delay, T: tool, I/A: custom params)
                     // Şimdilik görmezden geliyoruz, hareket etkilemiyor
                 }
-            }
-            
-            // Hareket komutu kontrolü
-            if (cmd === 'G0' || cmd === 'G00') {
-                isRapid = true;
-            } else if (cmd === 'G1' || cmd === 'G01') {
-                isRapid = false;
             }
             
             // Hareket varsa işle
