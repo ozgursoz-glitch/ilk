@@ -93,25 +93,20 @@ const GCodeParser = {
                 }
                 
                 // Sadece X/Y değiştiyse ve Z yüksekse (rapid gibi davran)
-                const isZHigh = newZ > 10; // Güvenlik yüksekliği
+                // Güvenlik yüksekliği: Z > 50mm ise rapid kabul et
+                const isZHigh = newZ > 50; 
                 
                 if ((isRapid || isZHigh) && (x !== newX || y !== newY)) {
                     // Hızlı geçiş (travel)
                     this.travels.push({ x1: x, y1: y, x2: newX, y2: newY });
                 } else if (!isRapid && !isZHigh && (x !== newX || y !== newY)) {
-                    // Kesim hareketi (cut)
+                    // Kesim hareketi (cut) - Z değeri 50mm veya altındaysa
                     this.cuts.push({ x1: x, y1: y, x2: newX, y2: newY, z: newZ });
                     if (newZ < this.bbox.minZ) this.bbox.minZ = newZ;
                     if (newZ > this.bbox.maxZ) this.bbox.maxZ = newZ;
                     if (newZ < 0 && Math.abs(newZ) > Math.abs(this.processDepth)) {
                         this.processDepth = newZ;
                     }
-                }
-                
-                // Delme döngüsü kontrolü (G81, G83)
-                if (cmd === 'G81' || cmd === 'G83') {
-                    this.drills.push({ x: newX, y: newY, z: newZ });
-                    this.drillCount++;
                 }
                 
                 // Pozisyonu güncelle

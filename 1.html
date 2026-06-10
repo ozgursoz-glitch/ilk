@@ -305,14 +305,14 @@
                         </g>
                     </g>
 
-                    <g id="drawLayer" transform="scale(1, -1) translate(0, -2100)">
-                        <line x1="0" y1="2087" x2="4200" y2="2087" stroke="#ff3333" stroke-width="3" stroke-dasharray="10,5" />
+                    <!-- drawLayer: Sol alt orijinli koordinat sistemi (Y yukarı doğru artar) -->
+                    <g id="drawLayer">
                         <path id="pathTravel" d="" stroke="#444444" fill="none" stroke-dasharray="8,4" />
                         <path id="pathCut" d="" stroke="#00d4ff" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" />
                         <g id="layerDrill"></g>
                     </g>
 
-                    <g id="lineIndicatorLayer" style="display: none; pointer-events: none;" transform="scale(1, -1) translate(0, -2100)">
+                    <g id="lineIndicatorLayer" style="display: none; pointer-events: none;">
                         <line id="indicatorX" x1="0" y1="0" x2="0" y2="2100" stroke="#ffff00" stroke-width="2" stroke-dasharray="6,4" opacity="0.8" />
                         <line id="indicatorY" x1="0" y1="0" x2="4200" y2="0" stroke="#ffff00" stroke-width="2" stroke-dasharray="6,4" opacity="0.8" />
                         <circle id="indicatorCenter" cx="0" cy="0" r="6" fill="#ffff00" stroke="#000" stroke-width="1.5" />
