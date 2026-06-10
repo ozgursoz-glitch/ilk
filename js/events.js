@@ -50,12 +50,37 @@ const Events = {
         
         const rect = svg.getBoundingClientRect();
         // SVG transform'ı ve zoom/pan dikkate alarak koordinat hesaplama
+        // Sol alt orijinli sistemde Y yukarı doğru artar
         const x = (e.clientX - rect.left - Viewer.panX) / Viewer.zoom;
         const y = (e.clientY - rect.top - Viewer.panY) / Viewer.zoom;
         
         const tooltip = document.getElementById('coordTooltip');
         if (tooltip) {
             tooltip.textContent = `X: ${x.toFixed(2)} | Y: ${y.toFixed(2)}`;
+        }
+        
+        // Çizgi izleme göstergesini güncelle
+        if (Viewer.showLineTrack) {
+            this.updateLineIndicator(x, y);
+        }
+    },
+    
+    updateLineIndicator: function(x, y) {
+        const indicatorX = document.getElementById('indicatorX');
+        const indicatorY = document.getElementById('indicatorY');
+        const indicatorCenter = document.getElementById('indicatorCenter');
+        const indicatorText = document.getElementById('indicatorText');
+        
+        if (indicatorX) indicatorX.setAttribute('x1', x);
+        if (indicatorY) indicatorY.setAttribute('y1', y);
+        if (indicatorCenter) {
+            indicatorCenter.setAttribute('cx', x);
+            indicatorCenter.setAttribute('cy', y);
+        }
+        if (indicatorText) {
+            indicatorText.setAttribute('x', x + 10);
+            indicatorText.setAttribute('y', y - 10);
+            indicatorText.textContent = `X:${x.toFixed(1)} Y:${y.toFixed(1)}`;
         }
     }
 };

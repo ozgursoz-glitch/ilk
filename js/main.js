@@ -74,23 +74,52 @@ document.addEventListener('DOMContentLoaded', function() {
         Events.renderCurrent();
     };
     
-    // Varsayılan örnek G-code
-    const defaultGCode = `G21
+    // Varsayılan örnek G-code (yeni .gm formatına uygun)
+    const defaultGCode = `G71
 G90
-G0 X0 Y0
-G1 X100 Y0 F500
-G1 X100 Y100
-G1 X0 Y100
-G1 X0 Y0
-G0 X200 Y200
-G1 X300 Y200
-G1 X300 Y300
-G1 X200 Y300
-G1 X200 Y200`;
+M05
+M06T6
+M21 I11-
+G00X0.000Y0.000
+M03S18000
+M20 A7+
+G04 D2
+M20 A7-
+G00X118.000Y302.387Z80.000
+G01Z45.000F3000.0
+G01X210.000Z40.650F4800.0
+Y226.187
+X26.000
+Y302.387
+X118.000
+X210.000Z36.300
+Y226.187
+X26.000
+Y302.387
+X118.000
+X210.000Z31.950
+Y226.187
+X26.000
+Y302.387
+X118.000
+X210.000Z27.600
+Y226.187
+X26.000
+Y302.387
+X118.000
+X210.000
+G00Z80.000
+G00X0.000Y0.000Z190.000
+M05
+M20 A8+
+G04 D2
+M20 A8-
+G00X0Y0
+M02`;
     
     document.getElementById('gcodeArea').value = defaultGCode;
     // DOM elementlerinin tamamen yüklenmesini bekleyip render yap
     setTimeout(function() {
         Events.renderCurrent();
-    }, 0);
+    }, 100);
 });
