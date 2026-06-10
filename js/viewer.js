@@ -33,10 +33,11 @@ const Viewer = {
         }
     },
     
-    // Transform uygula
+    // Transform uygula - drawLayer'ın kendi transform'unu koruyarak zoom ve pan uygular
     applyTransform: function() {
         const viewport = document.getElementById('viewport');
         if (viewport) {
+            // Sadece pan ve zoom transform'u uygula, drawLayer'ın içindeki transform'a dokunma
             viewport.setAttribute('transform', `translate(${this.panX}, ${this.panY}) scale(${this.zoom})`);
         }
     },
