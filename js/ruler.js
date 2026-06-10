@@ -69,8 +69,10 @@ const RulerTool = {
         const rulerText = document.getElementById('rulerText');
         const handleA = document.getElementById('handleA');
         const handleB = document.getElementById('handleB');
+        const handleAGroup = document.getElementById('handleAGroup');
+        const handleBGroup = document.getElementById('handleBGroup');
         
-        if (!rulerLine || !rulerText || !handleA || !handleB) return;
+        if (!rulerLine || !rulerText || !handleA || !handleB || !handleAGroup || !handleBGroup) return;
         
         const dx = this.endX - this.startX;
         const dy = this.endY - this.startY;
@@ -87,10 +89,43 @@ const RulerTool = {
         rulerText.setAttribute('y', midY - 10);
         rulerText.textContent = distance.toFixed(1) + ' mm';
         
+        // Kutuları merkezle (startX, startY) ve (endX, endY) olacak şekilde konumlandır
+        // rect x,y sol üst köşedir, bu yüzden -10 yapıyoruz (20x20 kutu)
         handleA.setAttribute('x', this.startX - 10);
         handleA.setAttribute('y', this.startY - 10);
         handleB.setAttribute('x', this.endX - 10);
         handleB.setAttribute('y', this.endY - 10);
+        
+        // Artı işaretlerini güncelle (kutunun merkezinde olmalı)
+        // handleAGroup ve handleBGroup içindeki line elementlerini bul ve güncelle
+        const plusHA_H = handleAGroup.querySelector('line:nth-of-type(1)');
+        const plusHA_V = handleAGroup.querySelector('line:nth-of-type(2)');
+        const plusHB_H = handleBGroup.querySelector('line:nth-of-type(1)');
+        const plusHB_V = handleBGroup.querySelector('line:nth-of-type(2)');
+        
+        if (plusHA_H && plusHA_V) {
+            plusHA_H.setAttribute('x1', this.startX - 5);
+            plusHA_H.setAttribute('y1', this.startY);
+            plusHA_H.setAttribute('x2', this.startX + 5);
+            plusHA_H.setAttribute('y2', this.startY);
+            
+            plusHA_V.setAttribute('x1', this.startX);
+            plusHA_V.setAttribute('y1', this.startY - 5);
+            plusHA_V.setAttribute('x2', this.startX);
+            plusHA_V.setAttribute('y2', this.startY + 5);
+        }
+        
+        if (plusHB_H && plusHB_V) {
+            plusHB_H.setAttribute('x1', this.endX - 5);
+            plusHB_H.setAttribute('y1', this.endY);
+            plusHB_H.setAttribute('x2', this.endX + 5);
+            plusHB_H.setAttribute('y2', this.endY);
+            
+            plusHB_V.setAttribute('x1', this.endX);
+            plusHB_V.setAttribute('y1', this.endY - 5);
+            plusHB_V.setAttribute('x2', this.endX);
+            plusHB_V.setAttribute('y2', this.endY + 5);
+        }
     },
     
     toggle: function() {
