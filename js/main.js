@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', function() {
     Events.init();
     
     window.triggerFileLoad = function() {
-        document.getElementById('fileInput').click();
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput) fileInput.click();
     };
     
     window.render = function() {
@@ -13,7 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     window.saveGCode = function() {
-        const gcode = document.getElementById('gcodeArea').value;
+        const gcodeArea = document.getElementById('gcodeArea');
+        if (!gcodeArea) return;
+        const gcode = gcodeArea.value;
         const blob = new Blob([gcode], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -25,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     window.saveSVG = function() {
         const svg = document.getElementById('mainSvg');
+        if (!svg) return;
         const serializer = new XMLSerializer();
         const svgStr = serializer.serializeToString(svg);
         const blob = new Blob([svgStr], { type: 'image/svg+xml' });
@@ -53,7 +57,9 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     window.updateToolWidth = function() {
-        const val = parseFloat(document.getElementById('toolDiameter').value);
+        const toolDiameterEl = document.getElementById('toolDiameter');
+        if (!toolDiameterEl) return;
+        const val = parseFloat(toolDiameterEl.value);
         if (val && val > 0) {
             Viewer.toolWidth = val;
             Events.renderCurrent();
@@ -61,7 +67,9 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     window.setToolDiameter = function(d) {
-        document.getElementById('toolDiameter').value = d;
+        const toolDiameterEl = document.getElementById('toolDiameter');
+        if (!toolDiameterEl) return;
+        toolDiameterEl.value = d;
         Viewer.toolWidth = d;
         Events.renderCurrent();
     };
@@ -81,5 +89,8 @@ G1 X200 Y300
 G1 X200 Y200`;
     
     document.getElementById('gcodeArea').value = defaultGCode;
-    Events.renderCurrent();
+    // DOM elementlerinin tamamen yüklenmesini bekleyip render yap
+    setTimeout(function() {
+        Events.renderCurrent();
+    }, 0);
 });

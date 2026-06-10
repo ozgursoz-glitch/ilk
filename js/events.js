@@ -25,14 +25,19 @@ const Events = {
         Viewer.currentFile = file.name;
         const reader = new FileReader();
         reader.onload = (evt) => {
-            document.getElementById('gcodeArea').value = evt.target.result;
-            this.renderCurrent();
+            const gcodeArea = document.getElementById('gcodeArea');
+            if (gcodeArea) {
+                gcodeArea.value = evt.target.result;
+                this.renderCurrent();
+            }
         };
         reader.readAsText(file);
     },
     
     renderCurrent: function() {
-        const gcode = document.getElementById('gcodeArea').value;
+        const gcodeArea = document.getElementById('gcodeArea');
+        if (!gcodeArea) return;
+        const gcode = gcodeArea.value;
         const data = GCodeParser.parse(gcode);
         Viewer.render(data);
     },
@@ -41,9 +46,13 @@ const Events = {
         if (!Viewer.showCoordinates) return;
         
         const svg = document.getElementById('mainSvg');
+        if (!svg) return;
+        
         const rect = svg.getBoundingClientRect();
+        // SVG transform'ı dikkate alarak koordinat hesaplama
+        // scale(1, -1) translate(0, -2100) transformasyonu için düzeltme
         const x = e.clientX - rect.left;
-        const y = rect.height - (e.clientY - rect.top);
+        const y = 2100 - (e.clientY - rect.top); // Y eksenini ters çevir
         
         const tooltip = document.getElementById('coordTooltip');
         if (tooltip) {

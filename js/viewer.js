@@ -51,20 +51,34 @@ const Viewer = {
     },
     
     updateStatus: function(data) {
-        document.getElementById('val-filename').textContent = this.currentFile;
-        document.getElementById('val-pts').textContent = data.lineCount;
-        document.getElementById('val-drillcnt').textContent = data.drillCount;
-        document.getElementById('val-w').textContent = Utils.formatNum(data.bbox.maxX);
-        document.getElementById('val-h').textContent = Utils.formatNum(data.bbox.maxY);
-        document.getElementById('val-zmin').textContent = Utils.formatNum(data.bbox.minZ);
-        document.getElementById('val-safe-z').textContent = Utils.formatNum(data.safeZ) + ' mm';
-        document.getElementById('val-process-depth').textContent = Utils.formatNum(data.processDepth) + ' mm';
-        document.getElementById('val-bbox').textContent = 
+        const filenameEl = document.getElementById('val-filename');
+        const ptsEl = document.getElementById('val-pts');
+        const drillcntEl = document.getElementById('val-drillcnt');
+        const wEl = document.getElementById('val-w');
+        const hEl = document.getElementById('val-h');
+        const zminEl = document.getElementById('val-zmin');
+        const safeZEl = document.getElementById('val-safe-z');
+        const processDepthEl = document.getElementById('val-process-depth');
+        const bboxEl = document.getElementById('val-bbox');
+        
+        if (filenameEl) filenameEl.textContent = this.currentFile;
+        if (ptsEl) ptsEl.textContent = data.lineCount;
+        if (drillcntEl) drillcntEl.textContent = data.drillCount;
+        
+        const width = data.bbox.maxX - data.bbox.minX;
+        const height = data.bbox.maxY - data.bbox.minY;
+        if (wEl) wEl.textContent = Utils.formatNum(width);
+        if (hEl) hEl.textContent = Utils.formatNum(height);
+        if (zminEl) zminEl.textContent = Utils.formatNum(data.bbox.minZ);
+        if (safeZEl) safeZEl.textContent = Utils.formatNum(data.safeZ) + ' mm';
+        if (processDepthEl) processDepthEl.textContent = Utils.formatNum(data.processDepth) + ' mm';
+        if (bboxEl) bboxEl.textContent = 
             `X: ${Utils.formatNum(data.bbox.minX)} / ${Utils.formatNum(data.bbox.maxX)} | Y: ${Utils.formatNum(data.bbox.minY)} / ${Utils.formatNum(data.bbox.maxY)}`;
         
         const focusedSection = document.getElementById('focused-line-section');
         if (this.focusedLineIndex >= 0) {
-            document.getElementById('val-focused-line').textContent = this.focusedLineIndex + 1;
+            const focusedLineEl = document.getElementById('val-focused-line');
+            if (focusedLineEl) focusedLineEl.textContent = this.focusedLineIndex + 1;
             if (focusedSection) focusedSection.style.display = 'flex';
         } else if (focusedSection) {
             focusedSection.style.display = 'none';
@@ -78,8 +92,12 @@ const Viewer = {
     
     setToolWidth: function(width) {
         this.toolWidth = width;
-        document.getElementById('toolDiameter').value = width;
-        this.render(GCodeParser.parse(document.getElementById('gcodeArea').value));
+        const toolDiameterEl = document.getElementById('toolDiameter');
+        if (toolDiameterEl) toolDiameterEl.value = width;
+        const gcodeArea = document.getElementById('gcodeArea');
+        if (gcodeArea) {
+            this.render(GCodeParser.parse(gcodeArea.value));
+        }
     },
     
     toggleCoordinateTracking: function() {
@@ -105,8 +123,11 @@ const Viewer = {
     
     setFocusedLine: function(lineIndex) {
         this.focusedLineIndex = lineIndex;
-        const data = GCodeParser.parse(document.getElementById('gcodeArea').value);
-        this.render(data);
+        const gcodeArea = document.getElementById('gcodeArea');
+        if (gcodeArea) {
+            const data = GCodeParser.parse(gcodeArea.value);
+            this.render(data);
+        }
     },
     
     updatePaths: function() {

@@ -39,10 +39,13 @@ const RulerTool = {
         e.preventDefault();
         
         const svg = document.getElementById('mainSvg');
+        if (!svg) return;
+        
         const rect = svg.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         
+        // SVG koordinat sistemine göre düzeltme (cetvel drawLayer dışında olduğu için normal koordinatlar kullanılır)
         const x = clientX - rect.left;
         const y = clientY - rect.top;
         

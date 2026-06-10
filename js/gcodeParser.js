@@ -73,7 +73,7 @@ const GCodeParser = {
                     }
                 }
                 
-                if (cmd === 'G81' || cmd === 'G83' || line.toUpperCase().includes('G81') || line.toUpperCase().includes('G83')) {
+                if (cmd === 'G81' || cmd === 'G83') {
                     this.drills.push({ x: newX, y: newY, z: newZ });
                     this.drillCount++;
                 }
